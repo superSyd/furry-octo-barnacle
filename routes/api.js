@@ -41,20 +41,21 @@ module.exports = function (app) {
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
 
       Book.find((err, books) => {
-        if(err || books == null){
+        if(err || books == null || books == ""){
           return res.json({
             "error": err
           })
         }
 
-        const bookList = []
+        var bookList = []
 
         bookList = books.map(item => {
-          return {
+          var bookObject = {
             "_id":item._id, 
             "title": item.book_title,
             "commentcount": item.book_comments.length
             }
+          return bookObject
         })
 
         return res.send(bookList)
@@ -113,20 +114,22 @@ module.exports = function (app) {
   app.route('/api/books/:id')
     .get(function (req, res){
       let bookid = req.params.id;
+      console.log(bookid)
       //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
 
       if(bookid){
-        Book.get({_id = bookid},(err,book)=>{
-          if(err || book == null){
+        Book.find({_id: bookid},(err,book)=>{
+          
+          if(err || book == "" || book == null){
             return res.send(
               "no book exists"
             )
           }
 
           return res.json({
-            "_id": book._id,
-            "title": book.book_title,
-            "comments": book.book_comments
+            "_id": book[0]._id,
+            "title": book[0].book_title,
+            "comments": book[0].book_comments
           })
         })
       } else {
@@ -141,15 +144,25 @@ module.exports = function (app) {
       let comment = req.body.comment;
       //json res format same as .get
       if(bookid){
+        if(!comment){
+          return res.send("missing required field comment")
 
-        Book.findById(bookid,(err,book)=>{
-          if(err || book == null){
+        } else {
+
+          Book.findById(bookid,(err,book)=>{
+
+          if(err || book == null || book == ""){
             return res.send("no book exists")
           }
 
           if(book){
-            if(comment){
+            if(book.book_comments == ""){
               book.book_comments = comment
+            } else {
+              book.book_comments.push(comment)
+
+            }
+              
 
               book.save((err,book)=>{
                 if(err){
@@ -166,15 +179,14 @@ module.exports = function (app) {
 
               })
               
-              
-
-            } else {
-              return res.send("missing required field comment")
-            }
             
           }
 
         })
+
+        }
+
+        
 
       } else {
         return res.send("Please enter book id")
@@ -186,14 +198,13 @@ module.exports = function (app) {
       //if successful response will be 'delete successful'
 
       if(bookid){
-        Book.findByIdAndRemove(_id, (err,book)=>{
-          if(err || book == null){
-            res.json({
-              "error":err
-            })
+        Book.findByIdAndRemove(bookid, (err,book)=>{
+          if(err || book == null || book == ""){
+            return res.send("no book exists")
+
           }
 
-          res.send("delete successful")
+          return res.send("delete successful")
 
         })
         

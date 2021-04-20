@@ -2,7 +2,7 @@
 
 const myPort = process.env['PORT']
 
-const myNodeEnv = "" //process.env['NODE_ENV']
+const myNodeEnv = process.env['NODE_ENV']
 
 
 const express     = require('express');
