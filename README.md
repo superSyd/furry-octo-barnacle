@@ -1,4 +1,4 @@
-# [Personal Library](https://boilerplate-project-library-1.supersyd.repl.co/)
+# [Personal Library Project](https://boilerplate-project-library-1.supersyd.repl.co/)
 
 Test Cases
 - You can send a POST request to /api/books with title as part of the form data to add a book. The returned response will be an object with the title and a unique _id as keys. If title is not included in the request, the returned response should be the string missing required field title.
